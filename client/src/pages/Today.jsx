@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTaskContext } from '../context/TaskContext';
 import TaskList from '../components/tasks/TaskList';
+import TaskQuickAdd from '../components/tasks/TaskQuickAdd';
 
 export default function Today() {
   const { tasks, fetchTasks, loading } = useTaskContext();
@@ -9,7 +10,9 @@ export default function Today() {
     fetchTasks({ filter: 'today' });
   }, [fetchTasks]);
 
+  const refresh = () => fetchTasks({ filter: 'today' });
   const activeCount = tasks.filter(t => !t.completed).length;
+  const completedCount = tasks.filter(t => t.completed).length;
 
   return (
     <div className="space-y-5">
@@ -22,13 +25,18 @@ export default function Today() {
 
       {loading ? (
         <div className="text-gray-400 text-sm animate-pulse">Loading...</div>
-      ) : activeCount === 0 && tasks.filter(t => t.completed).length === 0 ? (
-        <div className="text-center py-16 select-none">
-          <div className="text-5xl mb-3">🎉</div>
-          <p className="text-gray-400 text-sm">Nothing due today — enjoy your day!</p>
-        </div>
       ) : (
-        <TaskList tasks={tasks} />
+        <>
+          {activeCount === 0 && completedCount === 0 ? (
+            <div className="text-center py-10 select-none">
+              <div className="text-5xl mb-3">🎉</div>
+              <p className="text-gray-400 text-sm">Nothing due today — enjoy your day!</p>
+            </div>
+          ) : (
+            <TaskList tasks={tasks} onReorder={refresh} />
+          )}
+          <TaskQuickAdd onAdded={refresh} />
+        </>
       )}
     </div>
   );

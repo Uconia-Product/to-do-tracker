@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
+import { format } from 'date-fns';
 
-export default function TaskQuickAdd({ projectId, onAdded }) {
+export default function TaskQuickAdd({ projectId, onAdded, defaultDate }) {
   const { createTask } = useTaskContext();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState(4);
-  const [dueDate, setDueDate] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const initialDate = defaultDate || todayStr;
+  const [dueDate, setDueDate] = useState(initialDate);
+
+  const handleOpen = () => {
+    setDueDate(defaultDate || format(new Date(), 'yyyy-MM-dd'));
+    setOpen(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +31,8 @@ export default function TaskQuickAdd({ projectId, onAdded }) {
       });
       setTitle('');
       setPriority(4);
-      setDueDate('');
+      setDueDate(defaultDate || format(new Date(), 'yyyy-MM-dd'));
+      setOpen(false);
       onAdded?.();
     } finally {
       setLoading(false);
@@ -32,7 +42,7 @@ export default function TaskQuickAdd({ projectId, onAdded }) {
   if (!open) {
     return (
       <button
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         className="flex items-center gap-2 text-sm text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 py-2 mt-2 transition-colors group w-full"
       >
         <span className="w-5 h-5 rounded-full border-2 border-gray-300 group-hover:border-indigo-500 flex items-center justify-center text-xs group-hover:text-indigo-500 transition-colors">
@@ -84,7 +94,7 @@ export default function TaskQuickAdd({ projectId, onAdded }) {
         </button>
         <button
           type="button"
-          onClick={() => { setOpen(false); setTitle(''); setPriority(4); setDueDate(''); }}
+          onClick={() => { setOpen(false); setTitle(''); setPriority(4); setDueDate(defaultDate || format(new Date(), 'yyyy-MM-dd')); }}
           className="px-4 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           Cancel
