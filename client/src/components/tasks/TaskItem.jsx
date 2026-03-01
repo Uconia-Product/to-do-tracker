@@ -88,8 +88,8 @@ export default function TaskItem({ task, provided }) {
           style={{ width: 18, height: 18, marginTop: 2, flexShrink: 0 }}
           className={`rounded-full border-2 flex items-center justify-center transition-all checkbox-pop ${
             task.completed
-              ? 'bg-indigo-500 border-indigo-500'
-              : 'border-gray-300 hover:border-indigo-500'
+              ? 'bg-green-400 border-green-400'
+              : 'border-gray-300 hover:border-green-400'
           }`}
         >
           {task.completed && (
