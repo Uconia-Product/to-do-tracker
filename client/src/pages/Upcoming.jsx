@@ -13,10 +13,10 @@ export default function Upcoming() {
 
   const refresh = () => fetchTasks({ filter: 'upcoming' });
 
-  // Build array of the next 7 days starting from today
+  // Next 7 days starting from today
   const days = Array.from({ length: 7 }, (_, i) => addDays(startOfDay(new Date()), i));
 
-  // Group tasks by their due date key (yyyy-MM-dd)
+  // Group tasks by due-date string (yyyy-MM-dd)
   const tasksByDate = days.reduce((acc, day) => {
     const key = format(day, 'yyyy-MM-dd');
     acc[key] = tasks.filter(t => {
@@ -29,7 +29,8 @@ export default function Upcoming() {
   const activeCount = tasks.filter(t => !t.completed).length;
 
   return (
-    <div className="space-y-5 h-full">
+    <div className="space-y-5">
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">📆 Upcoming</h1>
         <p className="text-sm text-gray-400 mt-0.5">
@@ -40,7 +41,8 @@ export default function Upcoming() {
       {loading ? (
         <div className="text-gray-400 text-sm animate-pulse">Loading...</div>
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-6 -mx-1 px-1 items-start">
+        /* 7-column grid — fills the full available width, no scrollbar */
+        <div className="grid grid-cols-7 gap-3 w-full">
           {days.map(day => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const dayTasks = tasksByDate[dateKey] || [];
@@ -51,7 +53,7 @@ export default function Upcoming() {
             return (
               <div
                 key={dateKey}
-                className={`flex-none w-60 rounded-xl border flex flex-col ${
+                className={`min-w-0 rounded-xl border flex flex-col ${
                   isCurrentDay
                     ? 'border-indigo-200 dark:border-indigo-700 bg-indigo-50/60 dark:bg-indigo-950/30'
                     : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
@@ -59,12 +61,12 @@ export default function Upcoming() {
               >
                 {/* Day header */}
                 <div className="mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
-                  <p className={`text-xs font-bold uppercase tracking-wider ${
+                  <p className={`text-xs font-bold uppercase tracking-wider truncate ${
                     isCurrentDay ? 'text-indigo-500' : 'text-gray-400 dark:text-gray-500'
                   }`}>
-                    {isCurrentDay ? 'Today' : format(day, 'EEEE')}
+                    {isCurrentDay ? 'Today' : format(day, 'EEE')}
                   </p>
-                  <p className={`text-lg font-bold leading-tight ${
+                  <p className={`text-sm font-bold leading-tight ${
                     isCurrentDay
                       ? 'text-indigo-600 dark:text-indigo-400'
                       : 'text-gray-800 dark:text-white'
@@ -79,29 +81,29 @@ export default function Upcoming() {
                 </div>
 
                 {/* Active tasks */}
-                <div className="space-y-2 flex-1">
+                <div className="flex-1 space-y-2">
                   {activeDayTasks.map(task => (
                     <TaskItem key={task.id} task={task} />
                   ))}
 
                   {/* Completed tasks (dimmed) */}
                   {completedDayTasks.length > 0 && (
-                    <div className="space-y-2 opacity-50 mt-2">
+                    <div className="space-y-2 opacity-50 mt-1">
                       {completedDayTasks.map(task => (
                         <TaskItem key={task.id} task={task} />
                       ))}
                     </div>
                   )}
 
-                  {/* Empty state */}
+                  {/* Empty placeholder so the column doesn't collapse */}
                   {dayTasks.length === 0 && (
-                    <p className="text-xs text-gray-300 dark:text-gray-600 py-2 text-center select-none">
+                    <p className="text-xs text-gray-300 dark:text-gray-600 py-3 text-center select-none">
                       No tasks
                     </p>
                   )}
                 </div>
 
-                {/* Per-column Add task */}
+                {/* Per-column Add task — date is pre-filled to this day */}
                 <TaskQuickAdd defaultDate={dateKey} onAdded={refresh} />
               </div>
             );
